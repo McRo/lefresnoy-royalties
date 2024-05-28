@@ -16,7 +16,42 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
 
+from royalties.admin.admin import admin_site
+from royalties.views.home import HomeView
+from royalties.views.royalty import ShowRoyaltiesView
+from royalties.views.account import LoginView, LogoutView
+
+
+# ADMIN
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('grappelli/', include('grappelli.urls')), # grappelli URLS
+    # path('admin/', admin.site.urls),
+    path('admin/', admin_site.urls),
 ]
+
+# HOME
+
+urlpatterns += [
+    path('', HomeView.as_view(), name='home'),
+]
+
+# ACCOUNT
+account_patterns = [
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+]
+
+urlpatterns += [
+    path('account/', include((account_patterns, 'account'))),
+]
+
+
+# SHOW ROYALTIES
+
+urlpatterns += [
+    path('royalties/show', ShowRoyaltiesView.as_view(), name='royalties'),
+]
+
+

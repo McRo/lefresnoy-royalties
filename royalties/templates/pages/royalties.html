@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<h1>Infos</h1>
+<table>
+    <thead style="position:sticky;top:0;background: white;">
+        <tr>
+            <th>ACTIVITE</th>
+            <th>MONTANT</th>
+            <th>Taux Artiste</th>
+            <th>Fournisseur</th>
+            <th>Diffusion</th> 
+            <th>Demande</th>
+            <th>REMARQUES</th>
+            <th>PAIEMENT</th>
+            <th>BON DE COMMANDE</th>	
+            <th>Notification</th>
+
+    </tr>
+</thead>
+<tbody>
+    {% for royalty in royalties %}
+    <tr>
+        <td>{{ royalty.activity}}</td>
+        <td>{{ royalty.money }} 
+            {%if royalties.with_tax%}TTC{%else%}HT{%endif%}
+        </td>
+        <td>{{ royalty.artist_rate|floatformat:0}}%</td>
+        <td><span title='Siret : {{ royalty.supplier.siret }} : {{royalty.supplier.country}} - Contact :  {{ royalty.supplier.contact }}'>{{ royalty.supplier.title}}</span></td>
+        <td>{{ royalty.diffusion}} </td>
+        <td>{{ royalty.validation_date}} </td>
+        <td>{{ royalty.remark}} </td>
+        <td>{% if royalty.payment.first.payment_date %}
+            Payé le {{ royalty.payment.first.payment_date }}
+            {%else%}
+            Non payé
+            {%endif%} 
+        </td>
+        <td>{{ royalty.payment.first.purchase_order}} </td>
+        <td>{{ royalty.notifications.first}} </td>
+    </tr>
+</tbody>
+    {% endfor %}
+</table>
+
+
+{% endblock content %}

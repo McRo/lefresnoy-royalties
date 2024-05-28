@@ -1,0 +1,32 @@
+{% extends "account/base.html" %}
+{% load i18n tapeforms %}
+
+{% block main_title %}{% endblock %}
+
+{% block content %}
+{% if form.errors %}
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endfor %}
+{% elif next %}
+  <div class="alert alert-warning" role="alert">
+    {% if user.is_authenticated %}
+      {% trans "Your account doesn't have access to this page." %}
+    {% else %}
+      {% trans "Please log in to see this page." %}
+    {% endif %}
+  </div>
+{% endif %}
+
+<form method="post" action="{% url "account:login" %}" class="mb-3" autocomplete="off" novalidate>
+  {% csrf_token %}
+  {% formfield form.username %}
+  {% formfield form.password %}
+  <input type="hidden" name="next" value="{{ next }}">
+
+  <button type="submit" class="btn btn-primary btn-block">
+    {% trans "Sign in" %}
+  </button>
+</form>
+
+{% endblock %}

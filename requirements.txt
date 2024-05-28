@@ -1,1 +1,11 @@
 django==5.0.6
+django-extensions==3.2.3
+# CSS
+git+https://github.com/math-a3k/django-bootstrap-v5.git#egg=django-bootstrap-v5
+# FORMS
+django-tapeforms==1.2.0
+# Fields
+django-countries==7.6.1
+django-money==3.5.2
+# DEV TOOLS
+django-browser-reload==1.12.1

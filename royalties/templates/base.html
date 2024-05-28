@@ -1,0 +1,42 @@
+{% load bootstrap5 %}
+{% load static %}<!DOCTYPE html>
+<html class="no-js" lang="fr" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>
+      {% block title %}{% endblock %}
+      {% block title_suffix %}- Royalties{% endblock %}
+    </title>
+
+    {% block css %}
+      {% bootstrap_css %}
+    {% endblock %}
+
+    {% block js %}
+      {% bootstrap_javascript %}
+    {% endblock %}
+
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    {% block header %}
+      {% include "includes/header.html" %}
+    {% endblock %}
+
+    {% block main %}
+      <main class="container my-3">
+        {% block messages %}
+          {% include "includes/messages.html" %}
+        {% endblock %}
+
+        {% block content %}{% endblock %}
+      </main>
+    {% endblock %}
+
+    {% block footer %}{% endblock %}
+
+    {% block javascript %}{% endblock %}
+  </body>
+</html>
