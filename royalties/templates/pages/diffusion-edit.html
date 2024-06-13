@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if back %}<a class="btn btn-secondary" href="{{ back }}"> Retour </a>{% endif %}
+<form method="post" action="">
+    {% csrf_token %}
+    
+        {{ form.as_p }}
+    
+    <input type="submit" class="btn btn-primary" />
+</form>
+
+{% endblock %}

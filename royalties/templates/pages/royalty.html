@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<h1>DETAIL</h1>
+{% load i18n %}
+{% language 'fr' %}
+<p>
+    <strong>Redevance</strong>
+        <a class="d-inline nav-link" href="{% url "royalty-edit" pk=royalty.id %}"> ✎ </a>
+            <br/>
+    Activité : {{ royalty.activity}} <br/>
+    Montant : {{ royalty.money }} {%if royalty.with_tax == True %} TTC {% else %} HT {%endif%} <br/>
+    Taux Artiste : {{ royalty.artist_rate|floatformat:0}}<br/>
+    Validé le : {{ royalty.validation_date|date:"d M Y" }} <br/>
+    Remarques : {{ royalty.remark}} 
+    </p>
+    <p>
+    <strong>Founisseur</strong>
+    <a class="d-inline nav-link" href="{% url 'supplier-update' pk=royalty.supplier.id %}?royalty={{royalty.id}}"> ✎ </a>
+    <br/>
+    Nom : {{ royalty.supplier.title }} <br/>
+    Siret : {{ royalty.supplier.siret }} : {{royalty.supplier.country}}<br/>
+    Contact :  {{ royalty.supplier.contact }}'>{{ royalty.supplier.title}}
+    </p>
+<p>
+    <strong>Diffusion</strong>
+        <a class="d-inline nav-link" href="{% url "diffusion-update" pk=royalty.diffusion.id %}?royalty={{royalty.id}}"> ✎ </a>
+        <br/>
+    {{ royalty.diffusion}} <br/>
+    </p>
+    <p>
+    <strong>Comptabilité</strong>
+    <a class="d-inline nav-link" href="{% url "payment-update" pk=royalty.payment.id %}">✎</a>
+     <br/>
+    Bon de commande : {{ royalty.payment.first.purchase_order}} <br/>
+    {% if royalty.payment.payment_date %}
+    Payé le {{ royalty.payment.payment_date|date:"d M Y"  }}
+    {%else%}
+    Non payé
+    {%endif%} 
+    </p>
+    <p>
+        <strong>Notification</strong><br/>
+        {{ royalty.notifications.first}} 
+</p>
+
+{% endlanguage %}
+{% endblock content %}

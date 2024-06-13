@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<a class="btn btn-secondary" href="{% url "royalty-list"  %}"> Retour </a>
+<form method="post" action="">
+    {% csrf_token %}
+    
+        {{ form.as_tapeform }}
+    
+    <input type="submit" class="btn btn-primary" />
+</form>
+
+{% endblock %}

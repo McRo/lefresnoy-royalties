@@ -1,4 +1,6 @@
 from django.contrib.admin.apps import AdminConfig
 
 class RoyaltiesAdminConfig(AdminConfig):
-    pass
+    name = 'royalties.admin'
+    label = 'radmin'
+    # pass

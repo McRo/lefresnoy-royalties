@@ -20,7 +20,11 @@ from django.conf.urls import include
 
 from royalties.admin.admin import admin_site
 from royalties.views.home import HomeView
-from royalties.views.royalty import ShowRoyaltiesView
+from royalties.views.royalty import (RoyaltyListView, RoyaltyDetailView, RoyaltyUpdateView, update_royalty,
+                                     create_royalty)
+from royalties.views.payment import PaymentUpdateView
+from royalties.views.supplier import SupplierUpdateView
+from royalties.views.diffusion import DiffusionUpdateView
 from royalties.views.account import LoginView, LogoutView
 
 
@@ -51,7 +55,29 @@ urlpatterns += [
 # SHOW ROYALTIES
 
 urlpatterns += [
-    path('royalties/show', ShowRoyaltiesView.as_view(), name='royalties'),
+    path('royalties/show', RoyaltyListView.as_view(), name='royalty-list'),
+    path('royalties/<int:pk>/', RoyaltyDetailView.as_view(), name='royalty-detail'),
+    path('royalties/<int:pk>/edit', RoyaltyUpdateView.as_view(), name='royalty-edit'),
+    # path('royalties/<int:pk>/edit', update_royalty, name='royalty-edit'),
+    path('royalty/create', create_royalty, name='royalty-create'),
 ]
 
 
+# SHOW PAYEMNT
+
+urlpatterns += [
+    path('payment/<int:pk>/edit', PaymentUpdateView.as_view(), name='payment-update')
+]
+
+
+# SHOW SUPPLIER
+
+urlpatterns += [
+    path('supplier/<int:pk>/edit', SupplierUpdateView.as_view(), name='supplier-update')
+]
+
+# SHOW DIFFUSION
+
+urlpatterns += [
+    path('diffusion/<int:pk>/edit', DiffusionUpdateView.as_view(), name='diffusion-update')
+]

@@ -19,7 +19,10 @@ from royalties.models import ( Artist, Artwork, Diffusion, Supplier, Royalty, Pa
 def guessDate(date_str, default=None):
     if(date_str != ""):
         date_str = "01/05/2024" if date_str=="mai" else date_str
-        date_str = "01/02/2024" if date_str=="fevrier" else date_str
+        date_str = "01/03/2024" if date_str=="mars" else date_str
+        date_str = "01/02/2024" if date_str=="fevrier" or date_str=="février" else date_str
+        date_str = "01/01/2024" if date_str=="janvier" else date_str
+        date_str = "01/07/2024" if date_str=="S2 2023" or date_str=="S2/2023" else date_str
         multidates = ("-", "au", "+")
         for sep in multidates:
             if(sep in date_str):
@@ -44,13 +47,14 @@ def guessDate(date_str, default=None):
 
 
 def populateDB(data_line):
-    artist, created = Artist.objects.get_or_create(name=data_line["name"])
+    name = data_line["name"].title()
+    artist, created = Artist.objects.get_or_create(name=name)
     # if(created):
     #     artist.contact = 
     artwork, created = Artwork.objects.get_or_create(title=data_line["artwork_title"], artist=artist)
     # DIFF
     diff_date_start = guessDate(data_line["diff_start"], datetime.datetime.now())
-    diffusion, created = Diffusion.objects.get_or_create(start=diff_date_start, artist=artist, artwork=artwork)
+    diffusion, created = Diffusion.objects.get_or_create(title=data_line["supplier_title"], start=diff_date_start, artist=artist, artwork=artwork)
     # SUPPLIER
     supplier, created = Supplier.objects.get_or_create(title=data_line["supplier_title"],
                                                        address=data_line["supplier_address"],
@@ -58,32 +62,33 @@ def populateDB(data_line):
                                                        tva_intra=data_line["supplier_tva_intra"],
                                                        siret=data_line["siret"],
                                                        contact=data_line["supplier_contact"],)
+    # Payment
+    payment_date=guessDate(data_line["payment_date"])
+    billing_date = guessDate(data_line["billing_date"])
+    billing_send_date = guessDate(data_line["billing_send_date"])
+    payment = Payment.objects.create(number=data_line["number"],
+                                                payment_date=payment_date,
+                                                purchase_order=data_line["purchase_order"],
+                                                billing_date=billing_date,
+                                                billing_send_date=billing_send_date,)
     # ROYALTY
     amount = data_line["amount"] if data_line["amount"]!="" else data_line["with_tax"]
     amount = Decimal(amount.replace(';',',').replace(',','.').replace(' ','').replace('“','').replace('”','')) if amount else 0
     artist_rate = data_line["artist_rate"].replace("%",'') if data_line["artist_rate"] else None
     validation_date = guessDate(data_line["validation_date"])
-    billing_date = guessDate(data_line["billing_date"])
-    billing_send_date = guessDate(data_line["billing_send_date"])
     royalty, created = Royalty.objects.get_or_create(activity=data_line["activity"], 
                                     amount=amount,
                                     with_tax=data_line["with_tax"]!="",
                                     diffusion=diffusion,
                                     artist_rate=artist_rate,
                                     supplier=supplier,
-                                    validation_date=validation_date,
-                                    number=data_line["number"],
-                                    billing_date=billing_date,
-                                    billing_send_date=billing_send_date,
+                                    payment=payment,
+                                    validation_date=validation_date,                                    
                                     remark=data_line["remark"],
                                     money=Money(amount,'EUR')
                                     )
 
-    payment_date=guessDate(data_line["payment_date"])
-    payment, created = Payment.objects.get_or_create(royalty=royalty, 
-                                    payment_date=payment_date,
-                                    purchase_order=data_line["purchase_order"]
-                                    )
+    
 
 
 

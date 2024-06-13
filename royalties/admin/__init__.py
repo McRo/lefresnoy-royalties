@@ -1,1 +1,1 @@
-default_app_config = 'django.contrib.admin.apps.AdminConfig'
+default_app_config = 'royalties.admin.apps.RoyaltiesAdminConfig'

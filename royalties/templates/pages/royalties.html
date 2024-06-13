@@ -3,10 +3,14 @@
 {% block title %}Accueil{% endblock %}
 
 {% block content %}
+{% load i18n %}
+{% language 'fr' %}
 <h1>Infos</h1>
-<table>
+<a class="btn btn-success" href="{% url "royalty-create" %}"> Créer </a>
+<table class="table table-striped table-hover">
     <thead style="position:sticky;top:0;background: white;">
         <tr>
+            <th>Voir </th>
             <th>ACTIVITE</th>
             <th>MONTANT</th>
             <th>Taux Artiste</th>
@@ -17,33 +21,33 @@
             <th>PAIEMENT</th>
             <th>BON DE COMMANDE</th>	
             <th>Notification</th>
-
-    </tr>
-</thead>
-<tbody>
-    {% for royalty in royalties %}
-    <tr>
-        <td>{{ royalty.activity}}</td>
-        <td>{{ royalty.money }} 
-            {%if royalties.with_tax%}TTC{%else%}HT{%endif%}
-        </td>
-        <td>{{ royalty.artist_rate|floatformat:0}}%</td>
-        <td><span title='Siret : {{ royalty.supplier.siret }} : {{royalty.supplier.country}} - Contact :  {{ royalty.supplier.contact }}'>{{ royalty.supplier.title}}</span></td>
-        <td>{{ royalty.diffusion}} </td>
-        <td>{{ royalty.validation_date}} </td>
-        <td>{{ royalty.remark}} </td>
-        <td>{% if royalty.payment.first.payment_date %}
-            Payé le {{ royalty.payment.first.payment_date }}
-            {%else%}
-            Non payé
-            {%endif%} 
-        </td>
-        <td>{{ royalty.payment.first.purchase_order}} </td>
-        <td>{{ royalty.notifications.first}} </td>
-    </tr>
-</tbody>
+        </tr>
+    </thead>
+    <tbody>
+        {% for royalty in royalties %}
+        <tr>
+            <td><a class="nav-link" href="{% url "royalty-detail" pk=royalty.id %}"> 🔍 </a></td>
+            <td>{{ royalty.activity}}</td>
+            <td>{{ royalty.money }} 
+                {%if royalties.with_tax%}TTC{%else%}HT{%endif%}
+            </td>
+            <td>{{ royalty.artist_rate|floatformat:0}}%</td>
+            <td><span title='Siret : {{ royalty.supplier.siret }} : {{royalty.supplier.country}} - Contact :  {{ royalty.supplier.contact }}'>{{ royalty.supplier.title}}</span></td>
+            <td>{{ royalty.diffusion }} </td>
+            <td>{{ royalty.validation_date}} </td>
+            <td>{{ royalty.remark}} </td>
+            <td>{% if royalty.payment.payment_date %}
+                Payé le {{ royalty.payment.payment_date|date:"d M Y"  }}
+                {%else%}
+                Non payé
+                {%endif%} 
+            </td>
+            <td>{{ royalty.payment.first.purchase_order}} </td>
+            <td>{{ royalty.notifications.first}} </td>
+        </tr>
     {% endfor %}
+</tbody>
 </table>
-
+{% endlanguage %}
 
 {% endblock content %}

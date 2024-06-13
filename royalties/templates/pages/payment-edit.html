@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<a class="btn btn-secondary" href="{% url "royalty-detail" pk=payment.royalty.id %}"> Retour </a>
+<form method="post" action="">
+    {% csrf_token %}
+    <table class="table">
+        {{ form.as_table }}
+    </table>
+    <input type="submit" class="btn btn-primary" />
+</form>
+
+{% endblock %}

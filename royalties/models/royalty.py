@@ -8,6 +8,8 @@ from django.db import models
 from django_countries.fields import CountryField
 from djmoney.models.fields import MoneyField
 
+from django.utils.translation import gettext as _
+
 from decimal import Decimal
 
 # demande:Date	demande:N°, demande:Date création, 
@@ -18,6 +20,7 @@ from decimal import Decimal
 class Artist(models.Model):
     name = models.CharField(max_length=255, blank=False)
     contact = models.CharField(max_length=255, null=True, blank=False)
+    is_teacher = models.BooleanField(default=False, help_text="Professeur ?")
 
     def __str__(self):
         return "{} ({})".format(self.name, self.contact if self.contact else "contact manquant")
@@ -32,6 +35,8 @@ class Artwork(models.Model):
 
 
 class Diffusion(models.Model):
+    title = models.CharField(max_length=255, blank=True, help_text="Nom / lieu de la diffusion")
+
     start = models.DateField(blank=False, null=False)
     end = models.DateField(blank=True, null=True)
 
@@ -39,7 +44,15 @@ class Diffusion(models.Model):
     artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{} - {}".format(self.start.strftime("%B %Y"), self.artwork)
+        date = "Le "+self.start.strftime("%w %B %Y")
+        if not self.end or self.start == self.end:
+            date = _("Le "+self.start.strftime("%w %B %Y"))
+        elif self.start.strftime("%B %Y") == self.end.strftime("%B %Y"):
+            date = "Du "+self.start.strftime("%w")+" au "+ self.end.strftime("%w %B %Y")
+        else:
+            date = "Du "+self.start.strftime("%w %B")+" au "+ self.end.strftime("%w %B %Y")
+        title = ""+self.title if self.title else ""
+        return "{} {} - {}".format(title.capitalize(), date, self.artwork)
 
 
 class Supplier(models.Model):
@@ -47,12 +60,26 @@ class Supplier(models.Model):
     title = models.CharField(max_length=255)
     address = models.TextField(null=True, blank=True)
     country = CountryField(blank=True)
-    tva_intra = models.CharField(max_length=50)
-    siret = models.CharField(max_length=100)
+    tva_intra = models.CharField(max_length=50, blank=True)
+    siret = models.CharField(max_length=100, blank=True)
     contact = models.CharField(max_length=255, null=True, blank=False)
 
     def __str__(self):
         return "{} ({})".format(self.title, self.country)
+
+
+class Payment(models.Model):
+
+    number = models.CharField(max_length=50, blank=True, help_text="Numéro")
+    purchase_order = models.CharField(max_length=10, null=True, blank=True, help_text="Bon de commande")
+    
+    billing_date = models.DateField(help_text="Date de facturation", null=True, blank=True)
+    billing_send_date = models.DateField(help_text="Date d'envoi de la facture", null=True, blank=True)
+    
+    payment_date = models.DateField(help_text="Date de paiement", null=True, blank=True)
+
+    def __str__(self):
+        return "{}-{} paiement pour {}".format(self.number, self.payment_date.strftime("%B %Y") if self.payment_date else "??" ,self.royalty.diffusion.artist if self.royalty else "")
 
 
 class Royalty(models.Model):
@@ -65,17 +92,14 @@ class Royalty(models.Model):
     with_tax = models.BooleanField(default=True, help_text="HT or TTC")
     money = MoneyField(max_digits=14, decimal_places=2, null=True, default_currency='EUR')
     # 
-    diffusion = models.ForeignKey(Diffusion, on_delete=models.CASCADE)
+    diffusion = models.ForeignKey(Diffusion, null=True, blank=True, on_delete=models.CASCADE)
     artist_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, help_text="Pourcentage artiste")
 
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    
+    supplier = models.ForeignKey(Supplier, null=True, blank=True, related_name='royalties', on_delete=models.CASCADE)
     # 
     validation_date = models.DateField(help_text="Date à laquelle toutes les données sont remplies", null=True, blank=True)
     # comptabilite
-    number = models.CharField(max_length=50)
-    billing_date = models.DateField(help_text="Date de facturation", null=True, blank=True)
-    billing_send_date = models.DateField(help_text="Date d'envoi de la facture", null=True, blank=True)
+    payment = models.OneToOneField(Payment, null=True, blank=True, on_delete=models.CASCADE)
     # free remark
     remark = models.TextField(null=True, blank=True)
     # Dates of creation
@@ -85,14 +109,6 @@ class Royalty(models.Model):
     def __str__(self):
         return f"{self.activity} - {self.supplier} {self.diffusion.artist.name} {self.amount} {self.money.currency }"
     
-
-class Payment(models.Model):
-    royalty = models.ForeignKey(Royalty, related_name='payment', on_delete=models.CASCADE)
-    payment_date = models.DateField(null=True, blank=True)
-    purchase_order = models.CharField(max_length=10, help_text="Bon de commande")
-
-    def __str__(self):
-        return "{}-{} paiement pour {}".format(self.royalty.number, self.payment_date.strftime("%B %Y") if self.payment_date else "??" ,self.royalty.diffusion.artist)
 
 
 class Notification(models.Model):

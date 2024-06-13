@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<h1>Création</h1>
+{% load i18n %}
+{% language 'fr' %}
+
+<form method="post" action="" class="">
+    {% csrf_token %}
+    {{ all }}
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <p><strong>Redevance</strong></p>
+                    <div class="border-start border-3 ps-3">
+                        {{ royalty.as_p }}
+                    </div>
+                </div>
+                <div class="col">
+                    <p><strong>Diffusion</strong></p>
+                    <div class="border-start border-3 ps-3">
+                        {{ diffusion.as_p }}
+                    </div>
+                </div>
+                <div class="col">
+                    <p><strong>Fournisseur</strong></p>
+                    {{ all.supplier }}
+                    <div class="border-start border-3 ps-3">
+                        {{ supplier.as_p }}
+                    </div>
+                </div>
+                <div class="col">
+                    <p><strong>Comptabilité</strong></p>
+                    <div class="border-start border-3 ps-3">
+                        {{ payment.as_p }}
+                    </div>
+                </div>
+            </div>
+    </div>
+    
+    <input type="submit" class="btn btn-primary" />
+{% endlanguage %}
+{% endblock content %}

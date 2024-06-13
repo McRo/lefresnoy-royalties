@@ -14,10 +14,12 @@ from royalties.models import (
 )
 
 class ArtistAdmin(admin.ModelAdmin):
+    ordering = ('name',)
     pass
 
 
 class ArtworkAdmin(admin.ModelAdmin):
+    ordering = ('title',)
     pass
 
 
