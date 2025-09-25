@@ -1,7 +1,8 @@
 # custom ignore
 royalties/site_settings.py
 
-
+static/
+locale/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

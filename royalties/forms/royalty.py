@@ -1,16 +1,19 @@
 from django import forms
 from tapeforms.mixins import TapeformMixin
 from tapeforms.contrib.bootstrap import Bootstrap5TapeformMixin
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 from django_select2 import forms as s2forms
-from royalties.models import Artist, Artwork, Diffusion, Supplier, Payment, Royalty, Notification
+
 
 from django.forms.widgets import TextInput
 from django.utils.safestring import mark_safe
 
+from royalties.models import Artist, Artwork, Diffusion, Supplier, Payment, Royalty, Notification, Place
 
 
 class DatalistTextInput(TextInput):
-    def __init__(self, attrs=None):
+    def __init__(self, attrs=None,):
         super().__init__( attrs)
         if 'list' not in self.attrs or 'datalist' not in self.attrs:
             raise ValueError(
@@ -19,12 +22,12 @@ class DatalistTextInput(TextInput):
 
         # pop datalist for use by our render method. 
         # its a pseudo-attr rather than an actual one
-        self.datalist = self.attrs.pop('datalist') 
+        self.datalist = self.attrs.pop('datalist')
 
     def render(self, **kwargs):
         part1 = super().render( **kwargs)
         opts = ' '.join(
-            [ f'<option>{x}</option>' for x in self.datalist ]
+            [ f'<option value="{x}" />' for x in self.datalist ]
         )
         part2 = f'<datalist id="{self.datalist_name}">{opts}</datalist>'
         return part1 + mark_safe( part2)
@@ -58,6 +61,27 @@ class DiffusionForm(Bootstrap5TapeformMixin, forms.ModelForm):
         model = Diffusion
         fields = '__all__'
 
+    place = forms.CharField(
+        widget = DatalistTextInput( attrs={
+            'autocomplete':'off',
+            'list':'placeslist',
+            'datalist': Place.objects.distinct().order_by('title').values_list('title', flat=True)
+            }
+    ))
+    
+
+    def clean_place(self):
+        data = self.cleaned_data['place']
+        place = Place.objects.filter(title=data)
+        if place.count() > 1:
+            raise ValidationError("Multi PLACES, verify !")
+        if not place:
+            # place, created = Place.objects.get_or_create(title=data)
+            raise ValidationError("Emplacement non connu")
+        else:
+            place = place.first()
+        return place
+
 
 class ArtworkForm(Bootstrap5TapeformMixin, forms.ModelForm):
     class Meta:
@@ -81,7 +105,7 @@ class SupplierForm(Bootstrap5TapeformMixin, forms.ModelForm):
 class RoyaltyForm(Bootstrap5TapeformMixin, forms.ModelForm):
     class Meta:
         model = Royalty
-        # fields = '__all__'
+        fields = '__all__'
         fields = ('activity', 'money', 'with_tax', 'artist_rate', 'validation_date', 'remark',  )
 
     activity = forms.CharField(
@@ -100,3 +124,19 @@ class RoyaltyCreateForm(Bootstrap5TapeformMixin, forms.ModelForm):
         model = Royalty
         fields = '__all__'
         # exclude = ('payment',)
+
+    diffusion = forms.CharField(
+        widget = DatalistTextInput( attrs={
+            'autocomplete': 'off',
+            'list':'diffusionlist',
+            'datalist': Diffusion.objects.all()
+            }
+    ))
+
+    supplier = forms.CharField(
+        widget = DatalistTextInput( attrs={
+            'autocomplete': 'off',
+            'list':'diffusionlist',
+            'datalist': Supplier.objects.all()
+            }
+    ))

@@ -10,6 +10,7 @@ from django.views import View, generic
 
 from royalties.forms import RoyaltyForm, RoyaltyCreateForm, DiffusionForm, PaymentForm, SupplierForm
 from royalties.models import Royalty
+from royalties.models import Diffusion
 
 class RoyaltyListView(LoginRequiredMixin, generic.ListView):
     template_name = 'pages/royalties.html'
@@ -81,44 +82,58 @@ def create_royalty(request,):
 
     if request.method == 'POST':
         royalty_form = RoyaltyForm(request.POST, prefix='royalty')
+
         diffusion_form = DiffusionForm(request.POST, prefix='diffusion')
+        diffusion_id = request.POST['all-diffusion']      
+
+        print("diffusion", diffusion_id)  
+        
         supplier_form = SupplierForm(request.POST, prefix='supplier')
+        supplier_id = request.POST['all-supplier']
+
+        print("supplier_id", supplier_id)
+        
         payment_form = PaymentForm(request.POST, prefix='payment')
 
-        if all([royalty_form.is_valid(),
-                diffusion_form.is_valid(),
-                supplier_form.is_valid(), 
+        if all([diffusion_id,
+                supplier_id,
+                royalty_form.is_valid(), 
                 payment_form.is_valid()]):
-            new_diffusion = diffusion_form.save()
-            new_supplier = supplier_form.save()
-            new_payment = payment_form.save()
+            
 
-            new_royalty = royalty_form.save()
-            new_royalty.supplier=new_supplier
-            new_royalty.diffusion=new_diffusion
-            new_royalty.payment=new_payment
-
-            new_royalty.save()
-
-
-            print(new_supplier)
-
+            # create new royalty from FORM
+            royalty_create_form = RoyaltyCreateForm(request.POST, prefix='royalty')
+            # save it 
+            royalty = royalty_create_form.save(commit=False)
+            # set ids from select
+            royalty.diffusion_id = diffusion_id
+            royalty.supplier_id = supplier_id
+            # set onetoone
+            payment = payment_form.save()
+            royalty.payment_id = payment.id
+            # save
+            royalty.save()
+            
             messages.success(request, "Sauvegarde OK")
             #  return redirect(request.path)
-            return redirect("royalty-detail", pk=new_royalty.pk)
+            return redirect("royalty-detail", pk=royalty.pk)
+            
 
     else:
         royalty_form = RoyaltyForm(prefix='royalty')
+        # Create a datalist for all diffusions
         diffusion_form = DiffusionForm(prefix='diffusion')
+
         supplier_form = SupplierForm(prefix='supplier')
         payment_form = PaymentForm(prefix='payment')
 
         all_form = RoyaltyCreateForm(prefix='all')
 
-
     context= {"royalty":royalty_form, "diffusion":diffusion_form, 
               "supplier": supplier_form, 
-              "payment":payment_form, "all":all_form }
+              "payment":payment_form, 
+              "all":all_form 
+              }
     return render(
         request,
         "pages/royalty-create.html",

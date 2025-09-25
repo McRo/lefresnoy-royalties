@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load i18n %}
+{% language 'fr' %}
+
+<a class="btn btn-secondary" href='{% url "diffusion-list" %}'> Retour </a>
+
+<h1>{{ object.artwork.title }} de {{ object.artist.name }} au {{ object.title }}</h1>
+<p>Place : {{ object.place.city }}</p>
+{% if not object.end %}
+<p>Le {{ object.start|date }}</p>
+{% else %}
+<p>Du {{ object.start|date }} au {{ object.end|date }}</p>
+{% endif %}
+
+<a class="btn btn-primary" href='{% url "diffusion-edit" pk=object.pk %}'> Editer </a>
+
+{% endlanguage %}
+{% endblock %}

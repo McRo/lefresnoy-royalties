@@ -24,7 +24,7 @@ from royalties.views.royalty import (RoyaltyListView, RoyaltyDetailView, Royalty
                                      create_royalty)
 from royalties.views.payment import PaymentUpdateView
 from royalties.views.supplier import SupplierUpdateView
-from royalties.views.diffusion import DiffusionUpdateView
+from royalties.views.diffusion import DiffusionUpdateView, DiffusionListView, DiffusionCreateView, DiffusionDetailView
 from royalties.views.account import LoginView, LogoutView
 
 
@@ -79,5 +79,8 @@ urlpatterns += [
 # SHOW DIFFUSION
 
 urlpatterns += [
-    path('diffusion/<int:pk>/edit', DiffusionUpdateView.as_view(), name='diffusion-update')
+    path('diffusion/<int:pk>/edit', DiffusionUpdateView.as_view(), name='diffusion-edit'),
+    path('diffusion/', DiffusionListView.as_view(), name='diffusion-list'),
+    path('diffusion/create', DiffusionCreateView.as_view(), name='diffusion-create'),
+    path('diffusion/<int:pk>/detail', DiffusionDetailView.as_view(), name='diffusion-detail'),
 ]

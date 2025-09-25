@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load tapeforms %}
 
 {% if back %}<a class="btn btn-secondary" href="{{ back }}"> Retour </a>{% endif %}
 <form method="post" action="">
     {% csrf_token %}
     
-        {{ form.as_p }}
+        {% form form %}
     
     <input type="submit" class="btn btn-primary" />
 </form>
+
 
 {% endblock %}

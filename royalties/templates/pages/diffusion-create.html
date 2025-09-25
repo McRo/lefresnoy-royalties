@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Création{% endblock %}
+
+{% block content %}
+<h1>Création</h1>
+{% load i18n %}
+{% language 'fr' %}
+
+<form method="post" action="" class="">
+    {% csrf_token %}
+    <!-- {{ all }} -->
+        <div class="container">
+            <div class="row">
+                {% csrf_token %}
+                {{ form.as_p }}
+            </div>
+        </div>
+    
+    <input type="submit" class="btn btn-primary" />
+</form>
+{% endlanguage %}
+{% endblock content %}

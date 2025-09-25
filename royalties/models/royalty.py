@@ -12,6 +12,8 @@ from django.utils.translation import gettext as _
 
 from decimal import Decimal
 
+from .diffusion import Diffusion, Place
+
 # demande:Date	demande:N°, demande:Date création, 
 # demande:Envoi Mail, demande:Date envoie pdf, PAIEMENT:date, REMARQUES, MAIL,	
 # CHORUS:SIRET, chorus:BON DE COMMANDE
@@ -32,28 +34,7 @@ class Artwork(models.Model):
 
     def __str__(self):
         return f"{self.title} de {self.artist}"
-
-
-class Diffusion(models.Model):
-    title = models.CharField(max_length=255, blank=True, help_text="Nom / lieu de la diffusion")
-
-    start = models.DateField(blank=False, null=False)
-    end = models.DateField(blank=True, null=True)
-
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
-    artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE)
-
-    def __str__(self):
-        date = "Le "+self.start.strftime("%w %B %Y")
-        if not self.end or self.start == self.end:
-            date = _("Le "+self.start.strftime("%w %B %Y"))
-        elif self.start.strftime("%B %Y") == self.end.strftime("%B %Y"):
-            date = "Du "+self.start.strftime("%w")+" au "+ self.end.strftime("%w %B %Y")
-        else:
-            date = "Du "+self.start.strftime("%w %B")+" au "+ self.end.strftime("%w %B %Y")
-        title = ""+self.title if self.title else ""
-        return "{} {} - {}".format(title.capitalize(), date, self.artwork)
-
+    
 
 class Supplier(models.Model):
     # fournisseur
@@ -93,7 +74,7 @@ class Royalty(models.Model):
     money = MoneyField(max_digits=14, decimal_places=2, null=True, default_currency='EUR')
     # 
     diffusion = models.ForeignKey(Diffusion, null=True, blank=True, on_delete=models.CASCADE)
-    artist_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, help_text="Pourcentage artiste")
+    artist_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name="Pourcentage artiste" ,help_text="%")
 
     supplier = models.ForeignKey(Supplier, null=True, blank=True, related_name='royalties', on_delete=models.CASCADE)
     # 

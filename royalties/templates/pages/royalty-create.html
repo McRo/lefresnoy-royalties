@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Création{% endblock %}
 
 {% block content %}
 <h1>Création</h1>
@@ -9,26 +9,46 @@
 
 <form method="post" action="" class="">
     {% csrf_token %}
-    {{ all }}
+    <!-- {{ all }} -->
         <div class="container">
             <div class="row">
+                <div class="col">
+                    <p><strong>Diffusion</strong></p>
+                    {{ all.diffusion }}
+                    <!-- toggle creation diffusion -->
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#diffusionCollapse" aria-expanded="false" aria-controls="diffusionCollapse">
+                        Créer une nouvelle diffusion
+                    </button>
+                    <div class="collapse" id="diffusionCollapse">
+                        <div class="card card-body">
+                            {{ diffusion }}
+                        </div>
+                    </div>
+                    <!-- <div class="border-start border-3 ps-3">
+                        {{ diffusion.as_p }}
+                    </div> -->
+                    
+                <!-- </div>
+                <div class="col"> -->
+                    <p><strong>Fournisseur</strong></p>
+                    {{ all.supplier }}
+                    <!-- toggle creation supplier -->
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#supplierCollapse" aria-expanded="false" aria-controls="supplierCollapse">
+                        Créer un nouveau fournisseur
+                    </button>
+                    <div class="collapse" id="supplierCollapse">
+                        <div class="card card-body">
+                            {{ supplier }}
+                        </div>
+                    </div>
+                    <!-- <div class="border-start border-3 ps-3">
+                        {{ supplier.as_p }}
+                    </div> -->
+                </div>
                 <div class="col">
                     <p><strong>Redevance</strong></p>
                     <div class="border-start border-3 ps-3">
                         {{ royalty.as_p }}
-                    </div>
-                </div>
-                <div class="col">
-                    <p><strong>Diffusion</strong></p>
-                    <div class="border-start border-3 ps-3">
-                        {{ diffusion.as_p }}
-                    </div>
-                </div>
-                <div class="col">
-                    <p><strong>Fournisseur</strong></p>
-                    {{ all.supplier }}
-                    <div class="border-start border-3 ps-3">
-                        {{ supplier.as_p }}
                     </div>
                 </div>
                 <div class="col">
@@ -41,5 +61,6 @@
     </div>
     
     <input type="submit" class="btn btn-primary" />
+</form>
 {% endlanguage %}
 {% endblock content %}

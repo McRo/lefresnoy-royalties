@@ -43,3 +43,5 @@ MEDIA_URL = '/media/'
 
 
 FROM_EMAIL = ''
+
+LOGIN_REDIRECT_URL = 'coucou'
